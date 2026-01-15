@@ -1,73 +1,82 @@
 import functions
-import FreeSimpleGUI as GUI
+import FreeSimpleGUI as Gui
+import time
 
-label = GUI.Text("Type in to-do")
+Gui.theme("DarkPurple3")
 
-input_box = GUI.InputText(tooltip="Enter a todo", key='todo')
-add_button = GUI.Button("Add")
+clock = Gui.Text('',key="Clock")
 
-list_box = GUI.Listbox(values=[todo.strip() for todo in functions.get_todos()], key='todos',
+label = Gui.Text("Type in to-do")
+
+input_box = Gui.InputText(tooltip="Enter a todo", key='todo')
+add_button = Gui.Button("Add", font="Helvetica 16 bold", size=10)
+
+list_box = Gui.Listbox(values=[todo.strip() for todo in functions.get_todos()], key='todos',
                       enable_events=True, size=(45,10))
-edit_button = GUI.Button("Edit")
-complete_button = GUI.Button("Complete")
+edit_button = Gui.Button("Edit")
+complete_button = Gui.Button("Complete")
 
-exit_button = GUI.Button("Exit")
+exit_button = Gui.Button("Exit")
 
-window = GUI.Window('My ToDo App',
-                    layout=[[label],
+window = Gui.Window('My ToDo App',
+                    layout=[[clock],
+                            [label],
                             [input_box, add_button],
                             [list_box, edit_button, complete_button],
                             [exit_button]],
                     font=("Helvetica", 20))
 
 while True:
-    event, values = window.read()
-    print(1, event)
-    print(2, values)
-    print(3, values['todos'])
+    event, values = window.read(timeout=200)
+
+    if event in (Gui.WIN_CLOSED, "Exit"):
+        break
+
+    window["Clock"].update(value=time.strftime("%b %d %Y %H:%M:%S"))
 
     match event:
         case "Add":
-            todos = functions.get_todos()
-            new_todo = values['todo'] + "\n"
-            todos.append(new_todo)
-            functions.write_todos(todos)
-            window['todos'].update(
-                values=[todo.strip() for todo in todos])
+            if values['todo'].strip() != "":
+                todos = functions.get_todos()
+                new_todo = values['todo'].strip() + "\n"
+                todos.append(new_todo)
+                functions.write_todos(todos)
+                window['todos'].update(
+                    values=[todo.strip() for todo in todos])
+            else:
+                Gui.popup("Please enter a to-do", font=("Helvetica", 20))
 
         case "Edit":
-            if not values['todos']:
-                GUI.popup("Please select a task to edit")
-                continue
+            try:
+                todo_to_edit = values['todos'][0]
+                new_todo = values['todo'].strip() + "\n"
 
-            todo_to_edit = values['todos'][0]
-            new_todo = values['todo'].strip() + "\n"
+                todos = functions.get_todos()
+                index = todos.index(todo_to_edit.strip() + "\n")
+                todos[index] = new_todo
 
-            todos = functions.get_todos()
-            index = todos.index(todo_to_edit.strip() + "\n")
-            todos[index] = new_todo
-
-            functions.write_todos(todos)
-            window['todos'].update(
-                values=[todo.strip() for todo in todos]
-            )
+                functions.write_todos(todos)
+                window['todos'].update(
+                    values=[todo.strip() for todo in todos]
+                )
+            except IndexError:
+                Gui.popup("Please select an item to edit.", font=("Helvetica", 20))
 
         case 'Complete':
-            todo_to_complete = values['todos'][0]
-            todos = functions.get_todos()
-            todos.remove(todo_to_complete + "\n")
-            functions.write_todos(todos)
-            window['todos'].update(values=todos)
-            window['todo'].update(value='')
+            try:
+                todo_to_complete = values['todos'][0]
+                todos = functions.get_todos()
+                todos.remove(todo_to_complete + "\n")
+                functions.write_todos(todos)
+                window['todos'].update(values=todos)
+                window['todo'].update(value='')
+            except IndexError:
+                Gui.popup("Please select an item to complete.", font=("Helvetica", 20))
 
         case "Exit":
             break
 
         case 'todos':
             window['todo'].update(value=values['todos'][0])
-
-        case GUI.WIN_CLOSED:
-            break
-
 
 window.close()

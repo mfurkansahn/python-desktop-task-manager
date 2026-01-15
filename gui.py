@@ -1,6 +1,11 @@
 import functions
 import FreeSimpleGUI as Gui
 import time
+import os
+
+BASE_DIR = os.path.dirname(__file__)
+ADD_ICON = os.path.join(BASE_DIR, "Tools Png", "add.png")
+COMPLETE_ICON = os.path.join(BASE_DIR, "Tools Png", "complete.png")
 
 Gui.theme("DarkPurple3")
 
@@ -9,12 +14,12 @@ clock = Gui.Text('',key="Clock")
 label = Gui.Text("Type in to-do")
 
 input_box = Gui.InputText(tooltip="Enter a todo", key='todo')
-add_button = Gui.Button("Add", font="Helvetica 16 bold", size=10)
+add_button = Gui.Button(image_size=(30,30), image_source=ADD_ICON, mouseover_colors="LightBlue2", tooltip="Add a Todo", key="Add")
 
 list_box = Gui.Listbox(values=[todo.strip() for todo in functions.get_todos()], key='todos',
                       enable_events=True, size=(45,10))
 edit_button = Gui.Button("Edit")
-complete_button = Gui.Button("Complete")
+complete_button = Gui.Button(image_size=(30,30), image_source=COMPLETE_ICON, mouseover_colors="white", tooltip="Complete a todo", key="Complete")
 
 exit_button = Gui.Button("Exit")
 

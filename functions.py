@@ -1,4 +1,7 @@
-FILEPATH = "todos.txt"
+import os
+
+BASE_DIR = os.path.dirname(__file__)
+FILEPATH = os.path.join(BASE_DIR, "Todos", "todos.txt")
 
 def get_todos(filepath=FILEPATH):
     """

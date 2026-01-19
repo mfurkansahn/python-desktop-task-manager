@@ -2,10 +2,19 @@ import functions
 import FreeSimpleGUI as Gui
 import time
 import os
+import sys
 
-BASE_DIR = os.path.dirname(__file__)
-ADD_ICON = os.path.join(BASE_DIR, "Tools Png", "add.png")
-COMPLETE_ICON = os.path.join(BASE_DIR, "Tools Png", "complete.png")
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+ADD_ICON = resource_path(os.path.join("Tools Png", "add.png"))
+COMPLETE_ICON = resource_path(os.path.join("Tools Png", "complete.png"))
+
 
 Gui.theme("DarkPurple3")
 
@@ -53,6 +62,10 @@ while True:
 
         case "Edit":
             try:
+                if not values['todo'].strip():
+                    Gui.popup("Please enter a new value.", font=("Helvetica", 20))
+                    continue
+
                 todo_to_edit = values['todos'][0]
                 new_todo = values['todo'].strip() + "\n"
 
@@ -73,13 +86,12 @@ while True:
                 todos = functions.get_todos()
                 todos.remove(todo_to_complete + "\n")
                 functions.write_todos(todos)
-                window['todos'].update(values=todos)
-                window['todo'].update(value='')
+                window['todos'].update(
+                    values=[todo.strip() for todo in todos]
+                )
+                window['todo'].update("")
             except IndexError:
                 Gui.popup("Please select an item to complete.", font=("Helvetica", 20))
-
-        case "Exit":
-            break
 
         case 'todos':
             window['todo'].update(value=values['todos'][0])

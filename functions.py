@@ -1,27 +1,25 @@
 import os
 
-BASE_DIR = os.path.dirname(__file__)
-FILEPATH = os.path.join(BASE_DIR, "Todos", "todos.txt")
+DOCUMENTS_DIR = os.path.join(os.path.expanduser("~"), "Documents")
+APP_DIR = os.path.join(DOCUMENTS_DIR, "MyToDoApp")
+FILEPATH = os.path.join(APP_DIR, "todos.txt")
+
+if not os.path.exists(APP_DIR):
+    os.makedirs(APP_DIR)
+
+if not os.path.exists(FILEPATH):
+    with open(FILEPATH, "w", encoding="utf-8"):
+        pass
+
 
 def get_todos(filepath=FILEPATH):
-    """
-    Reads a text file and returns a list of todo items
-    """
-    with open(filepath, "r") as file_local:
-        todos_local = file_local.readlines()
-    return todos_local
+    with open(filepath, "r", encoding="utf-8") as file:
+        return file.readlines()
 
 
 def write_todos(todos_arg, filepath=FILEPATH):
-    """
-    Writes the todo items listed in the text file
-    :param todos_arg:
-    :param filepath:
-    :return:
-    """
-    with open(filepath, "w") as file_local:
-        file_local.writelines(todos_arg)
-
+    with open(filepath, "w", encoding="utf-8") as file:
+        file.writelines(todos_arg)
 
 if __name__ == "functions":
     print(f"The messages come from {__name__}")
